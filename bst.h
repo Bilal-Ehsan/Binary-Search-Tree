@@ -25,7 +25,7 @@ class BST {
 
   private:
     struct Node;
-    Node* root = leaf();
+    Node* _root = leaf();
 
     itemType* lookupRec(keyType, Node*);
     void insertRec(keyType, itemType, Node*&);
