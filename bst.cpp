@@ -3,14 +3,14 @@
 #include <iostream>
 
 struct BST::Node {
-  keyType _key;
-  itemType _item;
+  keyType key;
+  itemType item;
 
-  Node* _leftChild;
-  Node* _rightChild;
+  Node* leftChild;
+  Node* rightChild;
 
   Node(keyType k, itemType i) 
-    : _key(k), _item(i), _leftChild(nullptr), _rightChild(nullptr) { } 
+    : key(k), item(i), leftChild(nullptr), rightChild(nullptr) { } 
 };
 
 BST::Node* BST::leaf() { return nullptr; } 
@@ -24,12 +24,12 @@ BST::itemType* BST::lookup(keyType soughtKey) {
 BST::itemType* BST::lookupRec(keyType soughtKey, Node* currentNode) {
   if (isLeaf(currentNode)) return nullptr;
 
-  if (soughtKey == currentNode->_key)
-    return &(currentNode->_item);
+  if (soughtKey == currentNode->key)
+    return &(currentNode->item);
 
-  return soughtKey < currentNode->_key 
-    ? lookupRec(soughtKey, currentNode->_leftChild)
-    : lookupRec(soughtKey, currentNode->_rightChild);
+  return soughtKey < currentNode->key 
+    ? lookupRec(soughtKey, currentNode->leftChild)
+    : lookupRec(soughtKey, currentNode->rightChild);
 }
 
 void BST::insert(keyType k, itemType i) {
@@ -39,12 +39,12 @@ void BST::insert(keyType k, itemType i) {
 void BST::insertRec(keyType k, itemType i, Node*& currentNode) {
   if (isLeaf(currentNode)) {
     currentNode = new Node(k, i);
-  } else if (k == currentNode->_key) {
-    currentNode->_item = i;
-  } else if (k < currentNode->_key) {
-    insertRec(k, i, currentNode->_leftChild);
+  } else if (k == currentNode->key) {
+    currentNode->item = i;
+  } else if (k < currentNode->key) {
+    insertRec(k, i, currentNode->leftChild);
   } else {
-    insertRec(k, i, currentNode->_rightChild);
+    insertRec(k, i, currentNode->rightChild);
   }
 }
 
@@ -56,9 +56,9 @@ void BST::displayEntriesRec(Node* currentNode) {
   if (isLeaf(currentNode)) return;
 
   // In-order traversal
-  displayEntriesRec(currentNode->_leftChild);
-  std::cout << currentNode->_key << " " << currentNode->_item << std::endl;
-  displayEntriesRec(currentNode->_rightChild);
+  displayEntriesRec(currentNode->leftChild);
+  std::cout << currentNode->key << " " << currentNode->item << std::endl;
+  displayEntriesRec(currentNode->rightChild);
 }
 
 void BST::displayTree() {
@@ -72,11 +72,11 @@ void BST::displayTreeRec(const std::string& prefix, Node* currentNode, bool isLe
   if (!isLeaf(currentNode)) {
     std::cout << prefix;
     std::cout << (isLeft ? "├──" : "└──");
-    std::cout << currentNode->_key << std::endl;
+    std::cout << currentNode->key << std::endl;
 
     // Enter next tree level - left and right branch
-    displayTreeRec(prefix + (isLeft ? "│   " : "    "), currentNode->_leftChild, true);
-    displayTreeRec(prefix + (isLeft ? "│   " : "    "), currentNode->_rightChild, true);
+    displayTreeRec(prefix + (isLeft ? "│   " : "    "), currentNode->leftChild, true);
+    displayTreeRec(prefix + (isLeft ? "│   " : "    "), currentNode->rightChild, true);
   }
 }
 
@@ -85,14 +85,14 @@ BST::~BST() { deepDelete(_root); }
 void BST::deepDelete(Node* currentNode) {
   if (isLeaf(currentNode)) return;
 
-  deepDelete(currentNode->_leftChild);
-  deepDelete(currentNode->_rightChild);
+  deepDelete(currentNode->leftChild);
+  deepDelete(currentNode->rightChild);
   delete currentNode;
 }
 
 BST::Node* BST::minimumNode(Node* currentNode) {
-  while (!isLeaf(currentNode->_leftChild))
-    currentNode = currentNode->_leftChild;
+  while (!isLeaf(currentNode->leftChild))
+    currentNode = currentNode->leftChild;
   return currentNode;
 }
 
@@ -101,39 +101,39 @@ void BST::remove(keyType k) { removeRec(k, _root); }
 void BST::removeRec(keyType k, Node*& currentNode) {
   if (isLeaf(currentNode)) return;
 
-  else if (k < currentNode->_key) {
-    removeRec(k, currentNode->_leftChild);
+  else if (k < currentNode->key) {
+    removeRec(k, currentNode->leftChild);
   }
 
-  else if (k > currentNode->_key) {
-    removeRec(k, currentNode->_rightChild);
+  else if (k > currentNode->key) {
+    removeRec(k, currentNode->rightChild);
   }
 
   // Found node to delete
   else {
     // Case 1: Node has no children
-    if (isLeaf(currentNode->_leftChild) && isLeaf(currentNode->_rightChild)) {
+    if (isLeaf(currentNode->leftChild) && isLeaf(currentNode->rightChild)) {
       delete currentNode;
       currentNode = leaf();
     }
     
     // Case 2: Node has one child
-    else if (isLeaf(currentNode->_leftChild)) {
+    else if (isLeaf(currentNode->leftChild)) {
       Node* temp = currentNode;
-      currentNode = currentNode->_rightChild; // Moves root
+      currentNode = currentNode->rightChild; // Moves root
       delete temp;
-    } else if (isLeaf(currentNode->_rightChild)) {
+    } else if (isLeaf(currentNode->rightChild)) {
       Node* temp = currentNode;
-      currentNode = currentNode->_leftChild;
+      currentNode = currentNode->leftChild;
       delete temp;
     } 
     
     // Case 3: Node has two children
     else {
-      Node* temp = minimumNode(currentNode->_rightChild);
-      currentNode->_key = temp->_key;
-      currentNode->_item = temp->_item;
-      removeRec(temp->_key, currentNode->_rightChild);
+      Node* temp = minimumNode(currentNode->rightChild);
+      currentNode->key = temp->key;
+      currentNode->item = temp->item;
+      removeRec(temp->key, currentNode->rightChild);
     }
   }
 }
@@ -151,9 +151,9 @@ BST::BST(const BST& bstToCopy) {
 BST::Node* BST::deepCopy(Node* source) {
   if (isLeaf(source)) return nullptr;
 
-  Node* result = new Node(source->_key, source->_item);
-  result->_leftChild = deepCopy(source->_leftChild);
-  result->_rightChild = deepCopy(source->_rightChild);
+  Node* result = new Node(source->key, source->item);
+  result->leftChild = deepCopy(source->leftChild);
+  result->rightChild = deepCopy(source->rightChild);
   return result;
 }
 
